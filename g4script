@@ -57,7 +57,6 @@ weigh_factor = {
     "logicalLeftLeg": 0.01,
     "others": 0.12
 }
-parweigh_factor = 0
 parname = {
     "photon": 1,
     "electron": 1,
@@ -71,13 +70,8 @@ parname = {
     "alpha": 20
 }
 name = input("Input the name of the file(파일 이름 입력): ")
-rad = input("Input the particle's name(입자 이름 입력): ")
-for namep in parname.keys():
-    if rad == namep:
-        parweigh_factor = parname[namep]
-if parweigh_factor == 0:
-    print("wrong particle name")
-    exit(1)
+parweigh_factor = float(input("Input the radiation weighting factor(방사선 가중계수 입력): "))
+
 
 lines = []
 volines = []
@@ -101,7 +95,7 @@ for line in f.readlines():
     elif 'Mass' in line:
         for i in range(len(organ_name_male)):
             if organ_name_male[i].strip('logical') in line:
-                mass[organ_name_male[i]] = float(line.split(' ')[-2])     
+                mass[organ_name_male[i]] = float(line.split(' ')[-2])/1000
     
 #classify the data
 for i in range(len(lines)):
@@ -113,24 +107,30 @@ for i in range(len(lines)):
 #calculate
 for named in data.keys():
     mevtojoule = data[named] * jpkg
-    
-    eqdose[named] = data[named] * parweigh_factor
-    if named in weigh_factor:
-        efdose[named] = data[named] * weigh_factor[named]
-    else:
-        efdose[named] = data[named] * weigh_factor["others"]
+
     if mass[named] != 0:
         abdose[named] = data[named] / mass[named]
     else:
         abdose[named] = 0.0
+    if named in weigh_factor:
+        efdose[named] = abdose[named] * weigh_factor[named]
+    else:
+        efdose[named] = abdose[named] * weigh_factor["others"]
+    eqdose[named] = abdose[named] * parweigh_factor
 
 fname = f"data_{name}.csv"
+organ_name_male.insert(0, "organs")
+eqlist = ["{:.15f}".format(num) for num in eqdose.values()]
+eflist = ["{:.15f}".format(num) for num in efdose.values()]
+ablist = ["{:.15f}".format(num) for num in abdose.values()]
+eqlist.insert(0, "equivalent dose")
+eflist.insert(0, "effective dose")
+ablist.insert(0, "absorbed dose")
 with open(fname, "w") as f:
     writer = csv.writer(f)
     writer.writerow(organ_name_male)
-    writer.writerow(["{:.15f}".format(num) for num in data.values()])
-    writer.writerow(["{:.15f}".format(num) for num in eqdose.values()])
-    writer.writerow(["{:.15f}".format(num) for num in efdose.values()])
-    writer.writerow(["{:.15f}".format(num) for num in abdose.values()])
+    writer.writerow(eqlist)
+    writer.writerow(eflist)
+    writer.writerow(ablist)
 
 print("complete")
