@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
-
 import csv
+
 jpkg = 1.6 * (10 ** -13)
 def add_all(data) -> float:
     summed = 0.0
