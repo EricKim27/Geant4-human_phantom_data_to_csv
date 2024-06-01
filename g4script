@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import csv
-
+jpkg = 1.6 * (10 ** -13)
 def add_all(data) -> float:
     summed = 0.0
     for i in range(len(data)):
@@ -112,15 +112,15 @@ for i in range(len(lines)):
 
 #calculate
 for named in data.keys():
-    mevtojoule = data[named] * (1.6 * (10 ** -13))
+    mevtojoule = data[named] * jpkg
     
-    eqdose[named] = mevtojoule * parweigh_factor
+    eqdose[named] = data[named] * parweigh_factor
     if named in weigh_factor:
-        efdose[named] = mevtojoule * weigh_factor[named]
+        efdose[named] = data[named] * weigh_factor[named]
     else:
-        efdose[named] = mevtojoule * weigh_factor["others"]
+        efdose[named] = data[named] * weigh_factor["others"]
     if mass[named] != 0:
-        abdose[named] = mevtojoule / mass[named]
+        abdose[named] = data[named] / mass[named]
     else:
         abdose[named] = 0.0
 
@@ -128,6 +128,7 @@ fname = f"data_{name}.csv"
 with open(fname, "w") as f:
     writer = csv.writer(f)
     writer.writerow(organ_name_male)
+    writer.writerow(["{:.15f}".format(num) for num in data.values()])
     writer.writerow(["{:.15f}".format(num) for num in eqdose.values()])
     writer.writerow(["{:.15f}".format(num) for num in efdose.values()])
     writer.writerow(["{:.15f}".format(num) for num in abdose.values()])
