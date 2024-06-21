@@ -119,15 +119,18 @@ for named in data.keys():
 
 fname = f"data_{name}.csv"
 organ_name_male.insert(0, "organs")
+dlist = ["{:.15f}".format(num) for num in data.values()]
 eqlist = ["{:.15f}".format(num) for num in eqdose.values()]
 eflist = ["{:.15f}".format(num) for num in efdose.values()]
 ablist = ["{:.15f}".format(num) for num in abdose.values()]
-eqlist.insert(0, "equivalent dose")
-eflist.insert(0, "effective dose")
-ablist.insert(0, "absorbed dose")
-with open(fname, "w") as f:
+dlist.insert(0, "총 증착량(energy deposition)")
+eqlist.insert(0, "등가선량(equivalent dose)")
+eflist.insert(0, "유효선량(effective dose)")
+ablist.insert(0, "흡수선량(absorbed dose)")
+with open(fname, "w", encoding="utf-8") as f:
     writer = csv.writer(f)
     writer.writerow(organ_name_male)
+    writer.writerow(dlist)
     writer.writerow(eqlist)
     writer.writerow(eflist)
     writer.writerow(ablist)
