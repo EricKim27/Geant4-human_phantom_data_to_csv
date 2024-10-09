@@ -71,7 +71,6 @@ parname = {
 name = input("Input the name of the file(파일 이름 입력): ")
 parweigh_factor = float(input("Input the radiation weighting factor(방사선 가중계수 입력): "))
 
-
 lines = []
 volines = []
 mass = {}
@@ -95,6 +94,7 @@ for line in f.readlines():
         for i in range(len(organ_name_male)):
             if organ_name_male[i].strip('logical') in line:
                 mass[organ_name_male[i]] = float(line.split(' ')[-2])/1000
+                print(f"{organ_name_male[i]}: {mass[organ_name_male[i]]}")
     
 #classify the data
 for i in range(len(lines)):
@@ -108,14 +108,14 @@ for named in data.keys():
     mevtojoule = data[named] * jpkg
 
     if mass[named] != 0:
-        abdose[named] = data[named] / mass[named]
+        abdose[named] = mevtojoule / mass[named]
     else:
         abdose[named] = 0.0
     if named in weigh_factor:
-        efdose[named] = abdose[named] * weigh_factor[named]
+        efdose[named] = abdose[named] * weigh_factor[named] * parweigh_factor * (10 ** 4)
     else:
         efdose[named] = abdose[named] * weigh_factor["others"]
-    eqdose[named] = abdose[named] * parweigh_factor
+    eqdose[named] = abdose[named]
 
 fname = f"data_{name}.csv"
 organ_name_male.insert(0, "organs")
@@ -125,7 +125,7 @@ eflist = ["{:.15f}".format(num) for num in efdose.values()]
 ablist = ["{:.15f}".format(num) for num in abdose.values()]
 dlist.insert(0, "총 증착량(energy deposition)")
 eqlist.insert(0, "등가선량(equivalent dose)")
-eflist.insert(0, "유효선량(effective dose)")
+eflist.insert(0, "연간유효선량(effective dose)")
 ablist.insert(0, "흡수선량(absorbed dose)")
 with open(fname, "w", encoding="utf-8") as f:
     writer = csv.writer(f)
