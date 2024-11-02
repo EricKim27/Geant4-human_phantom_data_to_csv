@@ -111,8 +111,9 @@ for named in data.keys():
         abdose[named] = mevtojoule / mass[named]
     else:
         abdose[named] = 0.0
+    eqdose[named] = abdose[named] * parweigh_factor
     if named in weigh_factor:
-        efdose[named] = abdose[named] * weigh_factor[named] * parweigh_factor * (10 ** 4)
+        efdose[named] = abdose[named] * weigh_factor[named]
     else:
         efdose[named] = abdose[named] * weigh_factor["others"]
     eqdose[named] = abdose[named]

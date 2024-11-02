@@ -22,5 +22,6 @@ df_transposed.reset_index(inplace=True)
 # Rename the first column to 'organs'
 df_transposed.rename(columns={'index': 'organs'}, inplace=True)
 
+filename = f'transformed_{fname.strip(".csv")}.csv'
 # Save the transformed DataFrame back to a new CSV file
-df_transposed.to_csv(f'transformed_{fname}.csv', index=False)
+df_transposed.to_csv(filename, encoding='utf-8-sig', index=False)
