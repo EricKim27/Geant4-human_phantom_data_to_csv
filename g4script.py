@@ -141,4 +141,9 @@ with open(fname, "w", encoding="utf-8") as f:
     writer.writerow(ablist)
 """
 print(f"연간 유효선량: {yef}")
+fname = f"result_{name}.txt"
+with open(fname, "w", encoding="utf-8") as f:
+    f.write(f"총 이벤트 수:{total_event}\n")
+    f.write(f"총 에너지 증착량: {total_energy}\n")
+    f.write(f"연간 유효선량: {yef}\n")
 print("complete")

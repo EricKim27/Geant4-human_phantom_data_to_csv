@@ -1,6 +1,7 @@
 *.csv
 *.out
 *.zip
+*.txt
 /.idea/*
 .DS_Store
 /outfiles/*
