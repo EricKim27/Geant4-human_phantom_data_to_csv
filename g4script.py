@@ -68,19 +68,26 @@ parname = {
     "proton": 5,
     "alpha": 20
 }
+mass_female = 46
+mass_male = 50
+
 name = input("Input the name of the file(파일 이름 입력): ")
 parweigh_factor = float(input("Input the radiation weighting factor(방사선 가중계수 입력): "))
-
+mof = input("Male/Female: ")
+parenergy = float(input("Energy of a particle: "))
+if mof == "Male":
+    mass = mass_male
+else:
+    mass = mass_female
+total_energy = 0.0
 lines = []
 volines = []
-mass = {}
 data = {}
 eqdose = {}
 efdose = {}
 abdose = {}
-
+total_event = 0.0
 init_dict(data, organ_name_male)
-init_dict(mass, organ_name_male)
 init_dict(eqdose, organ_name_male)
 init_dict(efdose, organ_name_male)
 init_dict(abdose, organ_name_male)
@@ -88,36 +95,33 @@ f = open(name)
 
 #discern out the data that are actually needed
 for line in f.readlines():
-    if 'Energy Total' in line:
+    if 'Number of events' in line:
         lines.append(line.strip('\n'))
-    elif 'Mass' in line:
-        for i in range(len(organ_name_male)):
-            if organ_name_male[i].strip('logical') in line:
-                mass[organ_name_male[i]] = float(line.split(' ')[-2])/1000
-                print(f"{organ_name_male[i]}: {mass[organ_name_male[i]]}")
-    
+        total_event += float(line.split(' ')[-1])
+    if 'Total Energy' in line:
+        total_energy += float(line.split(' ')[-2]) 
 #classify the data
 for i in range(len(lines)):
     for j in range(len(organ_name_male)):
         splitted_lines = lines[i].split(' ')
         if splitted_lines[-7].strip("Run:").strip(",") == organ_name_male[j]:
             data[organ_name_male[j]] += float(splitted_lines[-1])
-
+print(mass)
+print(f"총 이벤트 수:{total_event}")
+print(f"총 에너지 증착량: {total_energy}")
 #calculate
 for named in data.keys():
     mevtojoule = data[named] * jpkg
 
-    if mass[named] != 0:
-        abdose[named] = mevtojoule / mass[named]
-    else:
-        abdose[named] = 0.0
+    abdose[named] = mevtojoule / mass
     eqdose[named] = abdose[named] * parweigh_factor
     if named in weigh_factor:
         efdose[named] = abdose[named] * weigh_factor[named]
     else:
         efdose[named] = abdose[named] * weigh_factor["others"]
     eqdose[named] = abdose[named]
-
+    yef = total_event * parenergy * jpkg * parweigh_factor * weigh_factor["others"] / mass * (10 ** 6)
+"""
 fname = f"data_{name}.csv"
 organ_name_male.insert(0, "organs")
 dlist = ["{:.15f}".format(num) for num in data.values()]
@@ -135,5 +139,6 @@ with open(fname, "w", encoding="utf-8") as f:
     writer.writerow(eqlist)
     writer.writerow(eflist)
     writer.writerow(ablist)
-
+"""
+print(f"연간 유효선량: {yef}")
 print("complete")
